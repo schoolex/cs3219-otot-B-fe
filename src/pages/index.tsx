@@ -15,7 +15,6 @@ export default function Home() {
     <div className="text-center">
       <h1>{import.meta.env.VITE_APP_TITLE}</h1>
       <p className="text-sm">via Vite</p>
-      <p className="text-xs">{keywords.join(', ')}</p>
     </div>
   )
 }
