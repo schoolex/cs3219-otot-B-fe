@@ -29,7 +29,7 @@ export default function Album() {
             sx={{ alignItems: 'right', justifyContent: 'space-around' }}
             noWrap
           >
-            Simple User Frontend
+            Simple Frontend
           </Typography>
         </Toolbar>
       </AppBar>

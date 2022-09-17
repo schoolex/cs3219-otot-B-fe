@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 
 import userService from '../services/userService'
+import getBusArrivals from '../services/busService'
 
 const defaultValues = {
   name: '',
@@ -28,17 +29,32 @@ interface userObject {
   description?: string
 }
 
+const BUS_STOP_CODE = '12061'
+const BUS_NO = '61'
+
 const Form = () => {
   const [open, setOpen] = useState(false)
   const [formValues, setFormValues] = useState(defaultValues)
 
   const [users, setUsers] = useState<userObject[]>([])
+  const [busInfo, setBusInfo] = useState({
+    nextBus: '-',
+    nextBus2: '-',
+    nextBus3: '-',
+  })
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserData = async () => {
       return await userService.getAllUsers()
     }
-    fetchData().then((data) => {
+    const fetchBusInfo = async () => {
+      return await getBusArrivals(BUS_STOP_CODE, BUS_NO)
+    }
+    fetchBusInfo().then((data) => {
+      setBusInfo(data)
+      console.log(data)
+    })
+    fetchUserData().then((data) => {
       setUsers(data)
       console.log(data)
     })
@@ -56,7 +72,12 @@ const Form = () => {
     e.preventDefault()
     setOpen(true)
     const { name, age, address, description } = formValues
-    const newUser = await userService.createUser(name, age, address, description)
+    const newUser = await userService.createUser(
+      name,
+      age,
+      address,
+      description
+    )
     console.log(newUser)
     setUsers([...users, newUser])
   }
@@ -69,6 +90,19 @@ const Form = () => {
   return (
     <div>
       <Container maxWidth="sm">
+        <Card sx={{
+          bgcolor: '#f5f5f5',
+          boxShadow: 1,
+          borderRadius: 2,
+          margin: '20px'
+        }}>
+          <CardContent>
+            <Typography variant="h5" color="text.primary" gutterBottom>
+              Bus {BUS_NO} @ {BUS_STOP_CODE}
+            </Typography>
+            <Typography variant="body2">Next bus in {busInfo.nextBus}, {busInfo.nextBus2}, {busInfo.nextBus3} minutes</Typography>
+          </CardContent>
+        </Card>
         <Typography variant="h5" color="inherit" noWrap>
           Create new user
         </Typography>
@@ -126,25 +160,25 @@ const Form = () => {
           users.map((user, idx) => (
             <Card key={idx}>
               <CardContent>
-                <Typography
-                  variant="h5"
-                  color="text.primary"
-                  gutterBottom
-                >
+                <Typography variant="h5" color="text.primary" gutterBottom>
                   {user.name}
                 </Typography>
-                <Typography variant="body2">
-                  Age: {user.age}
-                </Typography>
-                <Typography variant="body2">
-                  Address: {user.address}
-                </Typography>
+                <Typography variant="body2">Age: {user.age}</Typography>
+                <Typography variant="body2">Address: {user.address}</Typography>
                 <Typography variant="body2">
                   Description: {user.description}
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button size="small" color='error' onClick={()=> {handleDelete(user._id)}} >Delete</Button>
+                <Button
+                  size="small"
+                  color="error"
+                  onClick={() => {
+                    handleDelete(user._id)
+                  }}
+                >
+                  Delete
+                </Button>
               </CardActions>
             </Card>
           ))}
